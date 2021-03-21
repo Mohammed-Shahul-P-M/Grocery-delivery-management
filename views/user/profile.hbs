@@ -1,0 +1,687 @@
+<style>
+    body {
+        padding-bottom: 20px;
+        min-height: 100vh;
+    }
+
+    .menu,
+    .usercard,
+    #update-user-profile {
+        position: absolute;
+        box-shadow: 0 0 1px 1px teal;
+        background-color: rgb(226, 229, 233);
+    }
+
+    #update-user-profile {
+        width: 80%;
+        max-width: 450px;
+        padding: 10px 20px;
+        border-radius: 4px;
+        left: 50%;
+        margin-bottom: 30px;
+    }
+
+    #update-user-profile label {
+        font-size: 0.7rem;
+        margin-top: 3px;
+        display: block;
+
+    }
+
+    #update-user-profile>input,
+    textarea {
+        width: 90%;
+        margin: 4px auto;
+        border-radius: 4px;
+        background-color: rgb(233, 247, 243);
+    }
+
+    #update-user-profile input {
+        height: 25px;
+    }
+
+    .menu,
+    .usercard {
+        width: 80%;
+        max-width: 350px;
+        padding: 5px 10px;
+        margin-bottom: 20px;
+        left: 20px;
+        border-radius: 4px;
+    }
+
+    .menu a span {
+        padding: 0 5px;
+        background-color: rgb(238, 24, 9);
+        color: white;
+        border-radius: 4px;
+    }
+
+    .usercard {
+        height: 30px;
+
+    }
+
+    .usercard i {
+        position: relative;
+    }
+
+    .menu {
+        top: 160px;
+    }
+
+    .menu a {
+        font-weight: 550;
+        font-size: 0.9rem;
+        color: rgb(135, 34, 9);
+        display: block;
+        margin: 20px 5px;
+    }
+
+    #update-user-profile p.heading span {
+        font-size: 0.9rem;
+        color: blue;
+        margin-left: 50px;
+        cursor: pointer;
+    }
+
+    #update-user-profile input[type='submit'] {
+        outline: none;
+        border: none;
+        background-color: dodgerblue;
+        color: whitesmoke;
+        margin-bottom: 10px;
+        visibility: hidden;
+        cursor: pointer;
+    }
+
+    @media screen and (max-width:600px) {
+
+        .usercard,
+        .menu,
+        #update-user-profile {
+            position: absolute;
+            left: 0;
+            margin-left: 5%;
+            width: 80%;
+            box-shadow: none;
+            background-color: rgb(215, 225, 233);
+        }
+
+        .usercard {
+            top: 130px;
+            width: 85%;
+            box-shadow: none;
+        }
+
+        .menu {
+            top: 180px;
+            width: 85%;
+            text-align: center;
+        }
+
+        .menu a {
+            display: inline-block;
+            margin: auto 30px;
+        }
+
+        .menu a:first-child {
+            display: none;
+        }
+
+        #update-user-profile {
+            top: 220px;
+        }
+
+        #update-user-profile p.heading span {
+            margin-left: 40px;
+        }
+    }
+</style>
+
+
+<div id="snackbar">Some text some message..</div>
+<div class="usercard">
+    <i class="fas fa-user"> Hi welcome {{userData.name}}</i>
+</div>
+<div class="menu">
+    <a href="#">Personal Info</a>
+    <a onclick="showOrderContainer()" href="#">Orders {{#ifGt orders.length
+        0}} <span>{{orders.length}}</span> {{/ifGt}}</a>
+    <a onclick="showOrderContainer('orderhistory-container')" href="#">Order History {{#ifGt ordersHistory.length
+        0}}<span>{{ordersHistory.length}}</span>{{/ifGt}}</a>
+</div>
+<form id="update-user-profile" action="" class="" method="post">
+    <p class="heading">Personal Information <span onclick="showEditForm(event)">Edit</span></p>
+    <label for="name">Name</label>
+    <input type="text" name="name" value="{{userData.name}}" required disabled>
+    <label for="phone">Phone No</label>
+    <input type="text" value="{{userData.phone}}" disabled>
+    <label for="email">Email</label>
+    <input type="email" name="email" disabled required value="{{userData.email}}">
+    <label for="address">Delivery Address</label>
+    <textarea name="address" cols="30" disabled rows="3">{{userData.address}}</textarea>
+    <input type="submit" value="Save changes">
+</form>
+<style>
+    .container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        min-height: 100vh;
+        height: 100vh;
+        background-color: rgba(20, 19, 19, 0.952);
+        visibility: hidden;
+    }
+
+    .container p.btn {
+        font-weight: 550;
+        background-color: rgb(201, 196, 201);
+        max-width: 150px;
+        text-align: center;
+        padding: 2px 0;
+        border-radius: 4px;
+        margin-left: 30px;
+    }
+
+    .container .orders {
+        position: fixed;
+        width: 90%;
+        max-width: 800px;
+        background-color: rgb(252, 247, 252);
+        padding: 5px;
+        margin-top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 4px;
+    }
+
+    .container .orders .order-content {
+        width: 94%;
+        min-height: 300px;
+        height: 70vh;
+        overflow-y: scroll;
+        background-color: rgb(241, 212, 241);
+        border-radius: 4px;
+        margin: 3%;
+        padding-top: 10px;
+    }
+
+    .order-content .each-order {
+        width: 86%;
+        margin: 10px 3%;
+        box-shadow: 1px 1px 3px 3px gray;
+        background-color: rgb(236, 230, 230);
+        border-radius: 4px;
+        position: relative;
+        min-height: 80px;
+        font-size: 0.7rem;
+        padding: 10px;
+        padding-left: 20px;
+    }
+
+    .order-content .each-order p {
+        position: absolute;
+        font-size: 0.8rem;
+        font-weight: 550;
+    }
+
+    .order-content .each-order p.orderId {
+        color: rgb(13, 93, 93);
+        right: 5%;
+        top: -2px;
+        font-size: 0.65rem;
+    }
+
+    .order-content .each-order p.order-total {
+        right: 35%;
+        bottom: -5px;
+        color: rgb(169, 33, 9);
+    }
+
+    .order-content .each-order p.track {
+        right: 10%;
+        bottom: 0;
+        font-size: 0.6rem;
+        padding: 3px;
+        color: darkorchid;
+        font-weight: 550;
+    }
+
+    .order-content .each-order p.track span {
+        background-color: rgb(181, 211, 181);
+        border-radius: 4px;
+        padding: 4px;
+        color: darkred;
+    }
+
+    .order-content .each-order span.itemTotal {
+        position: absolute;
+        left: 30%;
+        color: rgb(11, 111, 9);
+    }
+
+    .order-content .each-order span.qnt {
+        position: absolute;
+        left: 25%;
+        color: blue;
+    }
+
+    .each-order p.date {
+        font-size: 0.6rem;
+        right: 10%;
+        font-weight: 550;
+        top: 30px;
+        color: rgb(177, 96, 68);
+    }
+
+    .each-order p.Titems {
+        right: 45%;
+        bottom: 0;
+        font-weight: 550;
+        font-size: 0.7rem;
+        color: mediumblue;
+    }
+
+    .order-content .each-order p.store {
+        left: 40%;
+        top: 15px;
+        color: rgb(90, 5, 23);
+        background-color: rgba(181, 207, 214, 0.918);
+        padding: 3px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .container .orders .closeBtn {
+        position: absolute;
+        left: 93%;
+        font-size: 1.6rem;
+        top: 10px;
+        cursor: pointer;
+    }
+
+    .container i {
+        color: blue;
+        position: absolute;
+        left: 40%;
+        cursor: pointer;
+        font-size: 0.6rem;
+        font-weight: 550;
+    }
+
+    i.fa-comments {
+        color: rgb(15, 1, 1);
+        left: 92%;
+        top: 70%;
+        font-size: 0.8rem;
+    }
+
+    @media screen and (max-width:600px) {
+        .container .orders .order-content .each-order {
+            width: 83%;
+            min-height: 120px;
+        }
+
+        .each-order p {
+            left: 53% !important;
+            width: none;
+        }
+
+        .each-order p.orderId {
+            top: -5px !important;
+            left: 43% !important;
+            font-size: 0.5rem !important;
+            font-weight: 550 !important;
+        }
+
+        .each-order p.store {
+            top: 20px !important;
+        }
+
+        .each-order p.order-total {
+            top: 70px !important;
+        }
+
+        .each-order p.date {
+            top: 50px !important;
+            font-size: 0.6rem !important;
+            font-weight: 550 !important;
+            left: 50% !important;
+        }
+
+        .each-order p.Titems {
+            top: 73px !important;
+            left: 70% !important;
+            display: inline !important;
+            width: 25% !important;
+        }
+
+        .each-order p.track {
+            width: 40% !important;
+            top: 100px;
+        }
+
+        .container i {
+            top: 16px;
+            left: 75%;
+
+        }
+
+        i.fa-comments {
+            color: rgb(15, 1, 1);
+            left: 92%;
+            top: 110px;
+            font-size: 0.8rem;
+        }
+
+        .each-order {
+            padding-top: 20px !important;
+        }
+
+        .order-content .each-order span.itemTotal {
+            left: 37.5%;
+            font-weight: 550;
+            font-size: 0.6rem;
+
+        }
+
+        .order-content .each-order span.qnt {
+            left: 31.5%;
+            font-weight: 550;
+            font-size: 0.6rem;
+        }
+
+        .order-content .each-order span.name {
+            margin-left: -10px !important;
+            font-weight: 550;
+            font-size: 0.6rem;
+        }
+
+        .orders {
+            height: 120% !important;
+        }
+
+    }
+</style>
+<div id="order-container" class="container">
+    <div class="orders">
+        <p class="btn">Orders<span onclick="closeOrderContainer()" class="closeBtn">x</span></p>
+        <div class="order-content">
+            {{#each orders}}
+            <div class="each-order">
+                <i class="fas fa-download" onclick="location.replace('/download/order/{{this._id}}')"> Download</i>
+                <p class="orderId">order_id : {{this._id}}</p>
+                <p class="order-total">₹ {{this.cartTotal}}</p>
+                <p class="date">{{this.date}}</p>
+                <p class="Titems">{{this.TotalItem}} Items</p>
+                <p onclick="location.replace('/store/{{this.storeId}}')" class="store">{{this.storeName}}</p>
+                <p class="track ">Status <span class="btn">{{this.status}}</span><span class="statusview" style="margin-left: 10px;
+                         cursor: pointer;
+                         background-color: blue;
+                         color: white;
+                        " onclick="showStatus('O',{{@index}})">?</span></p>
+                {{#each this.cartItems}}
+                <span class="name">{{this.name}}</span> <span class="qnt">{{this.qnt}}</span> <span class="itemTotal"> ₹
+                    {{X this.qnt
+                    this.price}}</span><br>
+                {{/each}}
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
+<div id="orderhistory-container" class="container">
+    <div class="orders">
+        <p class="btn">Order History <span onclick="closeOrderContainer('orderhistory-container')"
+                class="closeBtn">x</span></p>
+        <div class="order-content">
+            {{#each ordersHistory}}
+            <div class="each-order">
+                {{#ifEq this.status 'delivered'}}
+                <i onclick="location.replace('/feedback/{{this._id}}')" class="far fa-comments"
+                    style="color: {{#if this.feedback}}green{{/if}};"></i>
+                {{/ifEq}}
+                <i class="fas fa-download" onclick="location.replace('/download/orderhistory/{{this._id}}')">
+                    Download</i>
+                <p class="orderId">order_id : {{this._id}}</p>
+                <p class="order-total">₹ {{this.cartTotal}}</p>
+                <p class="date">{{this.date}}</p>
+                <p class="Titems">{{this.TotalItem}} Items</p>
+                <p onclick="location.replace('/store/{{this.storeId}}')" class="store">{{this.storeName}}</p>
+                <p class="track ">Status <span class="btn">{{this.status}}</span><span class="statusview" style="margin-left: 10px;
+                         cursor: pointer;
+                         background-color: blue;
+                         color: white;
+                        " onclick="showStatus('H',{{@index}})">?</span></p>
+                {{#each this.cartItems}}
+                <span class="name">{{this.name}}</span> <span class="qnt">{{this.qnt}}</span> <span class="itemTotal"> ₹
+                    {{X this.qnt
+                    this.price}}</span><br>
+                {{/each}}
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
+<style>
+    #progress-container {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.816);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        visibility: hidden;
+    }
+
+    #progress-div {
+        position: fixed;
+        left: 50%;
+        top: 55%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        width: 280px;
+        height: 370px;
+        z-index: 2;
+        border-radius: 4px;
+    }
+
+    #progress-div .closeBtn {
+        text-align: right;
+        margin: 10px;
+        font-weight: 550;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    #progress-div .progresbar {
+        height: 60%;
+        background-color: rgb(13, 172, 23);
+        width: 2px;
+        position: absolute;
+        left: 26px;
+        top: 22%;
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    li {
+        position: absolute;
+        font-weight: 550;
+        font-size: 0.8rem;
+    }
+
+    li:nth-child(1) {
+        top: 20%;
+    }
+
+    li:nth-child(2) {
+        top: 40%;
+    }
+
+    li:nth-child(3) {
+        top: 60%;
+    }
+
+    li:nth-child(4) {
+        top: 80%;
+    }
+
+    #progress-div .dot {
+        background-color: gray;
+        border-radius: 50%;
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        margin-left: -18px;
+        margin-right: 30px;
+    }
+
+    .confirm {
+        background-color: rgb(9, 149, 19) !important;
+    }
+
+    .confirm-t {
+        color: rgb(9, 149, 19);
+    }
+
+    .about-confirm {
+        background-color: white !important;
+        border: 2px solid rgb(9, 149, 19);
+        margin-left: -20px !important;
+    }
+
+    #progress-div i {
+        margin-left: -10px;
+        margin-right: 10px;
+        font-weight: 550;
+        color: black;
+    }
+
+    #progress-div p.heading {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.1rem;
+        color: blue;
+    }
+
+    #progress-div p.err {
+        font-weight: 550;
+        font-size: 0.7rem;
+        color: rgb(231, 5, 5);
+        position: absolute;
+        top: 25%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+</style>
+<div id="progress-container">
+    <div id="progress-div">
+        <p onclick="document.getElementById('progress-container').style.visibility='hidden'" class="closeBtn">X</p>
+        <p class="heading">Track order</p>
+        <p class="err"></p>
+        <div class="progresbar"></div>
+        <ul>
+        </ul>
+    </div>
+</div>
+<script>
+    let allOrder = JSON.parse('{{{json orders}}}')
+    let allHistory = JSON.parse('{{{json ordersHistory}}}')
+    function showStatus(section, index) {
+        let orderr = null
+
+        if (section == 'O') orderr = allOrder[index]
+        else if (section == 'H') orderr = allHistory[index]
+        else alert('fuck you')
+        let reqDiv = document.getElementById('progress-container')
+        reqDiv.style.visibility = 'visible'
+        let status = orderr.status
+        let number = 0
+        if (status == 'rejected') {
+            reqDiv.querySelector('p.err').innerText = 'Sorry your order is rejected. debitted amount will be credited to your balance'
+        } else {
+            if (status == 'confirmed') number = 1
+            if (status == 'out for delivery') number = 2
+            if (status == 'delivered') number = 3
+            if (status == 'delayed') number = 0
+            if (status == 'pending') reqDiv.querySelector('.err').innerText = 'Order  pending'
+            else reqDiv.querySelector('.err').innerText = ''
+            let a = 0
+            reqDiv.querySelector('ul').innerHTML = `
+            <li class="li0">
+                <div class="dot confirm div0"></div>
+              <i class="far fa-file-alt"></i> Order placed
+            </li>
+            <li class="li1">
+                <div class="dot div1"></div>
+                <i class="far fa-check-circle"></i> Order confirmed
+            </li>
+            <li class="li2">
+                <div class="dot div2"></div>
+                <i class="fas fa-shopping-cart"></i> Out for delivery
+            </li>
+            <li class="li3">
+                <div class="dot div3"></div>
+                <i class="fas fa-truck"></i> Order delivered
+            </li>
+        `
+
+            reqDiv.querySelector('.progresbar').style.height = 20 * number + '%'
+            while (a <= number) {
+                reqDiv.querySelector('.div' + a).classList.add('confirm')
+                a++
+            }
+        }
+    }
+    function showEditForm(e) {
+        let innerText = e.target.innerText
+        innerText = (innerText == 'Edit') ? 'cancel' : 'Edit'
+        e.target.innerText = innerText
+        if (innerText == 'cancel') {
+            document.querySelector('#update-user-profile>input[name="name"]').removeAttribute('disabled')
+            document.querySelector('#update-user-profile>input[name="email"]').removeAttribute('disabled')
+            document.querySelector('#update-user-profile>textarea[name="address"]').removeAttribute('disabled')
+            document.querySelector('#update-user-profile>input[type="submit"]').setAttribute('style', 'visibility:visible')
+        } else if (innerText == 'Edit') {
+            document.querySelector('#update-user-profile>input[name="name"]').setAttribute('disabled', 'true')
+            document.querySelector('#update-user-profile>input[name="email"]').setAttribute('disabled', 'true')
+            document.querySelector('#update-user-profile>textarea[name="address"]').setAttribute('disabled', 'true')
+            document.querySelector('#update-user-profile>input[type="submit"]').setAttribute('style', 'visibility:hidden')
+        }
+    }
+    $('#update-user-profile').submit(e => {
+        e.preventDefault()
+        showLoading()
+        $.ajax({
+            url: '/updateProfile',
+            method: 'post',
+            data: $('#update-user-profile').serialize(),
+            success: (res => {
+                checkLogin(res)
+                hideLoading()
+                if (res.loginErr) location.reload()
+                else if (res.err) alert(res.err)
+                else if (res) location.reload()
+            })
+        })
+    })
+    function showOrderContainer(id) {
+        let divId = 'order-container'
+        if (id) divId = id
+        document.getElementById(divId).style.visibility = 'visible'
+    }
+    function closeOrderContainer(id) {
+        let divId = 'order-container'
+        if (id) divId = id
+        document.getElementById(divId).style.visibility = 'hidden'
+    }
+</script>
